@@ -1,0 +1,114 @@
+//
+// !!! WARNING !!! AUTO-GENERATED FILE!
+// PLEASE DO NOT MODIFY IT AND USE "platformio.ini":
+// https://docs.platformio.org/page/projectconf/section_env_build.html#build-flags
+//
+{
+    "configurations": [
+        {
+            "name": "PlatformIO",
+            "includePath": [
+                "D:/Lauri/OneDrive/Projects/windows dynamic lighting device/include",
+                "D:/Lauri/OneDrive/Projects/windows dynamic lighting device/src",
+                "D:/Lauri/OneDrive/Projects/windows dynamic lighting device/.pio/libdeps/seeed_xiao/Adafruit TinyUSB Library/src",
+                "D:/Lauri/OneDrive/Projects/windows dynamic lighting device/.pio/libdeps/seeed_xiao/SdFat - Adafruit Fork/src",
+                "C:/Users/Lauri/.platformio/packages/framework-arduino-samd-seeed/libraries/USBHost/src",
+                "D:/Lauri/OneDrive/Projects/windows dynamic lighting device/.pio/libdeps/seeed_xiao/FastLED/src",
+                "C:/Users/Lauri/.platformio/packages/framework-arduino-samd-seeed/libraries/SPI",
+                "C:/Users/Lauri/.platformio/packages/framework-arduino-samd-seeed/libraries/Adafruit_ZeroDMA",
+                "C:/Users/Lauri/.platformio/packages/framework-arduino-samd-seeed/libraries/Adafruit_ZeroDMA/utility",
+                "C:/Users/Lauri/.platformio/packages/framework-arduino-samd-seeed/libraries/SoftwareSerial",
+                "C:/Users/Lauri/.platformio/packages/framework-cmsis/CMSIS/Core/Include",
+                "C:/Users/Lauri/.platformio/packages/framework-cmsis-atmel/CMSIS/Device/ATMEL",
+                "C:/Users/Lauri/.platformio/packages/framework-arduino-samd-seeed/cores/arduino",
+                "C:/Users/Lauri/.platformio/packages/framework-arduino-samd-seeed/cores/arduino/TinyUSB",
+                "C:/Users/Lauri/.platformio/packages/framework-arduino-samd-seeed/cores/arduino/TinyUSB/Adafruit_TinyUSB_ArduinoCore",
+                "C:/Users/Lauri/.platformio/packages/framework-arduino-samd-seeed/cores/arduino/TinyUSB/Adafruit_TinyUSB_ArduinoCore/tinyusb/src",
+                "C:/Users/Lauri/.platformio/packages/framework-cmsis/CMSIS/DSP/Include",
+                "C:/Users/Lauri/.platformio/packages/framework-arduino-samd-seeed/variants/XIAO_m0",
+                "D:/Lauri/OneDrive/Projects/windows dynamic lighting device/.pio/libdeps/seeed_xiao/Adafruit NeoPixel",
+                "D:/Lauri/OneDrive/Projects/windows dynamic lighting device/.pio/libdeps/seeed_xiao/Adafruit SPIFlash/src",
+                "D:/Lauri/OneDrive/Projects/windows dynamic lighting device/.pio/libdeps/seeed_xiao/MIDI Library/src",
+                "C:/Users/Lauri/.platformio/packages/framework-arduino-samd-seeed/libraries/Adafruit_TinyUSB_Arduino/src",
+                "C:/Users/Lauri/.platformio/packages/framework-arduino-samd-seeed/libraries/EnergySaving/src",
+                "C:/Users/Lauri/.platformio/packages/framework-arduino-samd-seeed/libraries/FlashStorage/src",
+                "C:/Users/Lauri/.platformio/packages/framework-arduino-samd-seeed/libraries/HID",
+                "C:/Users/Lauri/.platformio/packages/framework-arduino-samd-seeed/libraries/I2S/src",
+                "C:/Users/Lauri/.platformio/packages/framework-arduino-samd-seeed/libraries/LoRaWan",
+                "C:/Users/Lauri/.platformio/packages/framework-arduino-samd-seeed/libraries/Seeed_Arduino_FreeRTOS/src",
+                "C:/Users/Lauri/.platformio/packages/framework-arduino-samd-seeed/libraries/Seeed_Arduino_LCD",
+                "C:/Users/Lauri/.platformio/packages/framework-arduino-samd-seeed/libraries/TimerTC3",
+                "C:/Users/Lauri/.platformio/packages/framework-arduino-samd-seeed/libraries/TimerTCC0",
+                "C:/Users/Lauri/.platformio/packages/framework-arduino-samd-seeed/libraries/Wire",
+                ""
+            ],
+            "browse": {
+                "limitSymbolsToIncludedHeaders": true,
+                "path": [
+                    "D:/Lauri/OneDrive/Projects/windows dynamic lighting device/include",
+                    "D:/Lauri/OneDrive/Projects/windows dynamic lighting device/src",
+                    "D:/Lauri/OneDrive/Projects/windows dynamic lighting device/.pio/libdeps/seeed_xiao/Adafruit TinyUSB Library/src",
+                    "D:/Lauri/OneDrive/Projects/windows dynamic lighting device/.pio/libdeps/seeed_xiao/SdFat - Adafruit Fork/src",
+                    "C:/Users/Lauri/.platformio/packages/framework-arduino-samd-seeed/libraries/USBHost/src",
+                    "D:/Lauri/OneDrive/Projects/windows dynamic lighting device/.pio/libdeps/seeed_xiao/FastLED/src",
+                    "C:/Users/Lauri/.platformio/packages/framework-arduino-samd-seeed/libraries/SPI",
+                    "C:/Users/Lauri/.platformio/packages/framework-arduino-samd-seeed/libraries/Adafruit_ZeroDMA",
+                    "C:/Users/Lauri/.platformio/packages/framework-arduino-samd-seeed/libraries/Adafruit_ZeroDMA/utility",
+                    "C:/Users/Lauri/.platformio/packages/framework-arduino-samd-seeed/libraries/SoftwareSerial",
+                    "C:/Users/Lauri/.platformio/packages/framework-cmsis/CMSIS/Core/Include",
+                    "C:/Users/Lauri/.platformio/packages/framework-cmsis-atmel/CMSIS/Device/ATMEL",
+                    "C:/Users/Lauri/.platformio/packages/framework-arduino-samd-seeed/cores/arduino",
+                    "C:/Users/Lauri/.platformio/packages/framework-arduino-samd-seeed/cores/arduino/TinyUSB",
+                    "C:/Users/Lauri/.platformio/packages/framework-arduino-samd-seeed/cores/arduino/TinyUSB/Adafruit_TinyUSB_ArduinoCore",
+                    "C:/Users/Lauri/.platformio/packages/framework-arduino-samd-seeed/cores/arduino/TinyUSB/Adafruit_TinyUSB_ArduinoCore/tinyusb/src",
+                    "C:/Users/Lauri/.platformio/packages/framework-cmsis/CMSIS/DSP/Include",
+                    "C:/Users/Lauri/.platformio/packages/framework-arduino-samd-seeed/variants/XIAO_m0",
+                    "D:/Lauri/OneDrive/Projects/windows dynamic lighting device/.pio/libdeps/seeed_xiao/Adafruit NeoPixel",
+                    "D:/Lauri/OneDrive/Projects/windows dynamic lighting device/.pio/libdeps/seeed_xiao/Adafruit SPIFlash/src",
+                    "D:/Lauri/OneDrive/Projects/windows dynamic lighting device/.pio/libdeps/seeed_xiao/MIDI Library/src",
+                    "C:/Users/Lauri/.platformio/packages/framework-arduino-samd-seeed/libraries/Adafruit_TinyUSB_Arduino/src",
+                    "C:/Users/Lauri/.platformio/packages/framework-arduino-samd-seeed/libraries/EnergySaving/src",
+                    "C:/Users/Lauri/.platformio/packages/framework-arduino-samd-seeed/libraries/FlashStorage/src",
+                    "C:/Users/Lauri/.platformio/packages/framework-arduino-samd-seeed/libraries/HID",
+                    "C:/Users/Lauri/.platformio/packages/framework-arduino-samd-seeed/libraries/I2S/src",
+                    "C:/Users/Lauri/.platformio/packages/framework-arduino-samd-seeed/libraries/LoRaWan",
+                    "C:/Users/Lauri/.platformio/packages/framework-arduino-samd-seeed/libraries/Seeed_Arduino_FreeRTOS/src",
+                    "C:/Users/Lauri/.platformio/packages/framework-arduino-samd-seeed/libraries/Seeed_Arduino_LCD",
+                    "C:/Users/Lauri/.platformio/packages/framework-arduino-samd-seeed/libraries/TimerTC3",
+                    "C:/Users/Lauri/.platformio/packages/framework-arduino-samd-seeed/libraries/TimerTCC0",
+                    "C:/Users/Lauri/.platformio/packages/framework-arduino-samd-seeed/libraries/Wire",
+                    ""
+                ]
+            },
+            "defines": [
+                "PLATFORMIO=60115",
+                "ARDUINO_SAMD_ZERO",
+                "__SAMD21__",
+                "__SAMD21G18A__",
+                "ARM_MATH_CM0PLUS",
+                "SEEED_XIAO_M0",
+                "ARDUINO_SEEED_XIAO_M0",
+                "USE_TINYUSB",
+                "ARDUINO=10805",
+                "F_CPU=48000000L",
+                "USBCON",
+                "USB_VID=0x2886",
+                "USB_PID=0x802F",
+                "USB_PRODUCT=\"Seeeduino XIAO\"",
+                "USB_MANUFACTURER=\"Seeed\"",
+                "ARDUINO_ARCH_SAMD",
+                "USB_CONFIG_POWER=100",
+                ""
+            ],
+            "cStandard": "gnu11",
+            "cppStandard": "gnu++11",
+            "compilerPath": "C:/Users/Lauri/.platformio/packages/toolchain-gccarmnoneeabi/bin/arm-none-eabi-gcc.exe",
+            "compilerArgs": [
+                "-mcpu=cortex-m0plus",
+                "-mthumb",
+                ""
+            ]
+        }
+    ],
+    "version": 4
+}
