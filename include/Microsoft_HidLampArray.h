@@ -1,15 +1,5 @@
-// Copyright (c) Microsoft Corporation.  All rights reserved.
-// Licensed under the MIT License.
-
 #pragma once
 
-#if !defined(USBCON)
-
-#warning "Platform does not support PluggableUSB"
-
-#else
-
-#include <Microsoft_HidDevice.h>
 #include <stdint.h>
 
 #define LAMP_NOT_PROGRAMMABLE 0x00

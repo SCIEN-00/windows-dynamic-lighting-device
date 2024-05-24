@@ -1,20 +1,42 @@
 #pragma once
 #include <cstdint>
 
+#define LAMP_NOT_PROGRAMMABLE 0x00
+#define LAMP_IS_PROGRAMMABLE 0x01
+
+enum LampPurposeKind
+{
+	LampPurposeControl = 1,
+	LampPurposeAccent = 2,
+	LampPurposeBranding = 4,
+	LampPurposeStatus = 8,
+	LampPurposeIllumination = 16,
+	LampPurposePresentation = 32,
+};
+
+enum LampArrayKind
+{
+	LampArrayKindKeyboard = 1,
+	LampArrayKindMouse = 2,
+	LampArrayKindGameController = 3,
+	LampArrayKindPeripheral = 4,
+	LampArrayKindScene = 5,
+	LampArrayKindNotification = 6,
+	LampArrayKindChassis = 7,
+	LampArrayKindWearable = 8,
+	LampArrayKindFurniture = 9,
+	LampArrayKindArt = 10,
+};
+
 struct __attribute__((__packed__)) LampAttributes
 {
 	uint16_t LampId;
-	uint32_t PositionXInMillimeters;
-	uint32_t PositionYInMillimeters;
-	uint32_t PositionZInMillimeters;
-	uint32_t UpdateLatencyInMilliseconds;
-	uint32_t LampPurposes;
+	uint32_t PositionXInMicrometers;
+	uint32_t PositionYInMicrometers;
+	uint32_t PositionZInMicrometers;
 	uint8_t RedLevelCount;
 	uint8_t GreenLevelCount;
 	uint8_t BlueLevelCount;
-	uint8_t IntensityLevelCount;
-	uint8_t IsProgrammable;
-	uint8_t LampKey;
 };
 
 struct __attribute__((__packed__)) LampArrayColor
