@@ -167,6 +167,10 @@ extern "C"
 #define PIN_USB_DM (22ul)
 #define PIN_USB_DP (23ul)
 
+// USB Product String
+#define USB_PRODUCT "Ambient Lighting"
+#define USB_MANUFACTURER "Windows Dynamic Lighting"
+
 /*
  * I2S Interfaces
  */

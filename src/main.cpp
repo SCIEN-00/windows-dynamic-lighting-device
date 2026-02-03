@@ -96,7 +96,8 @@ static_assert(((sizeof(neoPixelStripLampAttributes) / sizeof(LampAttributes)) ==
 
 // Initialize Microsoft LampArray
 // Strip is 600mm long (60 * 10mm), 10mm tall, 1mm deep
-Microsoft_HidLampArray lampArray = Microsoft_HidLampArray(NEO_PIXEL_LAMP_COUNT, 600, 10, 1, LampArrayKindPeripheral, 33, neoPixelStripLampAttributes);
+// Using Scene type so Windows renders it as ambient lighting device
+Microsoft_HidLampArray lampArray = Microsoft_HidLampArray(NEO_PIXEL_LAMP_COUNT, 600, 10, 1, LampArrayKindScene, 33, neoPixelStripLampAttributes);
 
 // Autonomous mode color (black when Windows not controlling)
 // Black background lets Windows-controlled accent colors stand out
