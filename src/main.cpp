@@ -155,9 +155,6 @@ void loop()
 
 uint32_t lampArrayColorToNeoPixelColor(LampArrayColor lampArrayColor)
 {
-	// Apply intensity scaling to RGB channels
-	uint8_t r = (lampArrayColor.RedChannel * lampArrayColor.IntensityChannel) / 255;
-	uint8_t g = (lampArrayColor.GreenChannel * lampArrayColor.IntensityChannel) / 255;
-	uint8_t b = (lampArrayColor.BlueChannel * lampArrayColor.IntensityChannel) / 255;
-	return neoPixelStrip.Color(r, g, b);
+	// Match Microsoft example: ignore IntensityChannel for now
+	return neoPixelStrip.Color(lampArrayColor.RedChannel, lampArrayColor.GreenChannel, lampArrayColor.BlueChannel);
 }
