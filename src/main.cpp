@@ -16,6 +16,9 @@
 // Temporary test mode to verify NeoPixel output independent of HID
 #define FORCE_TEST 0
 
+// Apply LampArray intensity channel when available
+#define USE_INTENSITY 0
+
 // Initialize NeoPixel library
 Adafruit_NeoPixel neoPixelStrip = Adafruit_NeoPixel(NEO_PIXEL_LAMP_COUNT, NEO_PIXEL_PIN, NEO_PIXEL_TYPE);
 
@@ -95,8 +98,9 @@ static_assert(((sizeof(neoPixelStripLampAttributes) / sizeof(LampAttributes)) ==
 // Strip is 600mm long (60 * 10mm), 10mm tall, 1mm deep
 Microsoft_HidLampArray lampArray = Microsoft_HidLampArray(NEO_PIXEL_LAMP_COUNT, 600, 10, 1, LampArrayKindPeripheral, 33, neoPixelStripLampAttributes);
 
-// Autonomous mode color (blue when Windows not controlling)
-uint32_t lampArrayAutonomousColor = neoPixelStrip.Color(0, 0, 255);
+// Autonomous mode color (black when Windows not controlling)
+// Black background lets Windows-controlled accent colors stand out
+uint32_t lampArrayAutonomousColor = neoPixelStrip.Color(0, 0, 0);
 
 // Forward declaration
 uint32_t lampArrayColorToNeoPixelColor(LampArrayColor lampArrayColor);
@@ -107,7 +111,7 @@ void setup()
 	neoPixelStrip.begin();
 	neoPixelStrip.clear();
 
-	// Always initially in Autonomous-Mode (blue)
+	// Always initially in Autonomous-Mode (gray)
 	neoPixelStrip.fill(lampArrayAutonomousColor, 0, NEO_PIXEL_LAMP_COUNT - 1);
 	neoPixelStrip.show();
 }
@@ -155,6 +159,12 @@ void loop()
 
 uint32_t lampArrayColorToNeoPixelColor(LampArrayColor lampArrayColor)
 {
-	// Match Microsoft example: ignore IntensityChannel for now
+#if USE_INTENSITY
+	uint8_t r = (lampArrayColor.RedChannel * lampArrayColor.IntensityChannel) / 255;
+	uint8_t g = (lampArrayColor.GreenChannel * lampArrayColor.IntensityChannel) / 255;
+	uint8_t b = (lampArrayColor.BlueChannel * lampArrayColor.IntensityChannel) / 255;
+	return neoPixelStrip.Color(r, g, b);
+#else
 	return neoPixelStrip.Color(lampArrayColor.RedChannel, lampArrayColor.GreenChannel, lampArrayColor.BlueChannel);
+#endif
 }
