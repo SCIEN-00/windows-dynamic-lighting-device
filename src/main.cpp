@@ -94,16 +94,24 @@ uint32_t autonomousColor = pixels.Color(0, 0, 255);
 
 void setup()
 {
+	// Initialize Serial for debugging
+	Serial.begin(115200);
+	delay(1000);
+	Serial.println("Setup started");
+
 	// Initialize NeoPixel strip
+	Serial.println("Initializing NeoPixel strip on pin 2...");
 	pixels.begin();
 	pixels.clear();
 
 	// Start in autonomous mode with blue for all LEDs
+	Serial.println("Setting all LEDs to blue (autonomous mode)");
 	for (uint16_t i = 0; i < NUM_LAMPS; i++)
 	{
 		pixels.setPixelColor(i, autonomousColor);
 	}
 	pixels.show();
+	Serial.println("Setup complete - pixels shown");
 }
 
 void loop()
@@ -111,6 +119,14 @@ void loop()
 	// Get current lamp state from Windows
 	LampArrayColor currentState[NUM_LAMPS];
 	bool isAutonomousMode = lampArray.getCurrentState(currentState);
+
+	static bool lastMode = true;
+	if (isAutonomousMode != lastMode)
+	{
+		Serial.print("Mode changed to: ");
+		Serial.println(isAutonomousMode ? "AUTONOMOUS (blue)" : "WINDOWS CONTROL");
+		lastMode = isAutonomousMode;
+	}
 
 	if (isAutonomousMode)
 	{
