@@ -1,0 +1,26 @@
+Warning! Ignore unknown configuration option `upload_disable_flushing` in section [env:seeed_xiao]
+Processing seeed_xiao (platform: atmelsam; board: seeed_xiao; framework: arduino)
+--------------------------------------------------------------------------------
+Verbose mode can be enabled via `-v, --verbose` option
+CONFIGURATION: https://docs.platformio.org/page/boards/atmelsam/seeed_xiao.html
+PLATFORM: Atmel SAM (8.3.0) > Seeeduino XIAO
+HARDWARE: SAMD21G18A 48MHz, 32KB RAM, 256KB Flash
+DEBUG: Current (atmel-ice) External (atmel-ice, blackmagic, jlink)
+PACKAGES: 
+ - framework-arduino-samd-seeed @ 1.8.5 
+ - framework-cmsis @ 2.50400.181126 (5.4.0) 
+ - framework-cmsis-atmel @ 1.2.2 
+ - toolchain-gccarmnoneeabi @ 1.70201.0 (7.2.1)
+LDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf
+LDF Modes: Finder ~ chain, Compatibility ~ soft
+Found 15 compatible libraries
+Scanning dependencies...
+Dependency Graph
+|-- Adafruit NeoPixel @ 1.15.2
+|-- Adafruit TinyUSB Library @ 1.18.3
+Building in release mode
+Checking size .pio\build\seeed_xiao\firmware.elf
+Advanced Memory Usage is available via "PlatformIO Home > Project Inspect"
+RAM:   [=         ]  11.9% (used 3892 bytes from 32768 bytes)
+Flash: [=         ]   6.8% (used 17792 bytes from 262144 bytes)
+========================= [SUCCESS] Took 1.91 seconds =========================
