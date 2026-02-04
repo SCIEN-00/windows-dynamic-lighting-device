@@ -13,24 +13,21 @@
 // WS2812B is GRB format at 800KHz
 #define NEO_PIXEL_TYPE (NEO_GRB + NEO_KHZ800)
 
-// Temporary test mode to verify NeoPixel output independent of HID
-#define FORCE_TEST 0
-
 // Apply LampArray intensity channel when available
 #define USE_INTENSITY 0
 
 // Initialize NeoPixel library
 Adafruit_NeoPixel neoPixelStrip = Adafruit_NeoPixel(NEO_PIXEL_LAMP_COUNT, NEO_PIXEL_PIN, NEO_PIXEL_TYPE);
 
-// UpdateLatency for all Lamps set to 4msec
-#define NEO_PIXEL_LAMP_UPDATE_LATENCY (0x04)
+// UpdateLatency for all Lamps set to 2msec
+#define NEO_PIXEL_LAMP_UPDATE_LATENCY (0x02)
 
 // Lamp attributes for 60 LEDs in a line
 // All positions in millimeters from start of strip
 // All times in milliseconds
 static LampAttributes neoPixelStripLampAttributes[] PROGMEM =
 	{
-		// Id  X     Y     Z     Latency                        Purposes           RED   GRN   BLUE  GAIN  PROGAMMBLE?           KEY
+		// Id  X  Y  Z  Latency                        Purposes           RED   GRN   BLUE  GAIN  PROGAMMBLE?           KEY
 		{0x00, 0, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
 		{0x01, 10, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
 		{0x02, 20, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
@@ -99,9 +96,9 @@ static_assert(((sizeof(neoPixelStripLampAttributes) / sizeof(LampAttributes)) ==
 // Using Scene type so Windows renders it as ambient lighting device
 Microsoft_HidLampArray lampArray = Microsoft_HidLampArray(NEO_PIXEL_LAMP_COUNT, 600, 10, 1, LampArrayKindScene, 33, neoPixelStripLampAttributes);
 
-// Autonomous mode color (black when Windows not controlling)
-// Black background lets Windows-controlled accent colors stand out
-uint32_t lampArrayAutonomousColor = neoPixelStrip.Color(0, 0, 0);
+// Autonomous mode: rainbow spectrum animation
+// Shows 25% of the spectrum across the whole strip, smoothly scrolling
+#define RAINBOW_HUE_SPEED 8 // Hue units per ms (65536/8 ≈ 8.2s per full cycle)
 
 // Forward declaration
 uint32_t lampArrayColorToNeoPixelColor(LampArrayColor lampArrayColor);
@@ -111,29 +108,11 @@ void setup()
 	// Initialize the NeoPixel library
 	neoPixelStrip.begin();
 	neoPixelStrip.clear();
-
-	// Always initially in Autonomous-Mode (gray)
-	neoPixelStrip.fill(lampArrayAutonomousColor, 0, NEO_PIXEL_LAMP_COUNT - 1);
 	neoPixelStrip.show();
 }
 
 void loop()
 {
-#if FORCE_TEST
-	static bool isOn = false;
-	static uint32_t lastToggleMs = 0;
-	const uint32_t now = millis();
-	if (now - lastToggleMs >= 500)
-	{
-		lastToggleMs = now;
-		isOn = !isOn;
-		const uint32_t testColor = isOn ? neoPixelStrip.Color(255, 0, 0) : neoPixelStrip.Color(0, 0, 0);
-		neoPixelStrip.fill(testColor, 0, NEO_PIXEL_LAMP_COUNT);
-		neoPixelStrip.show();
-	}
-	return;
-#endif
-
 	LampArrayColor currentLampArrayState[NEO_PIXEL_LAMP_COUNT];
 	bool isAutonomousMode = lampArray.getCurrentState(currentLampArrayState);
 
@@ -141,9 +120,30 @@ void loop()
 
 	for (uint16_t i = 0; i < NEO_PIXEL_LAMP_COUNT; i++)
 	{
-		// Autonomous-Mode: Host indicates device should decide what to render
-		// In this case, render blue when no application is controlling
-		uint32_t newColor = isAutonomousMode ? lampArrayAutonomousColor : lampArrayColorToNeoPixelColor(currentLampArrayState[i]);
+		uint32_t newColor;
+
+		if (isAutonomousMode)
+		{
+			// Autonomous-Mode: Scrolling spectrum window
+			// All 60 LEDs show only 25% of spectrum at once, window scrolls through full spectrum
+			uint32_t now = millis();
+
+			// Calculate spectrum offset (smoothly scrolls through 0-65535 hue range)
+			uint16_t spectrumOffset = (uint16_t)((now * RAINBOW_HUE_SPEED) & 0xFFFF);
+
+			// Each LED shows a portion of the 25% spectrum window
+			// 25% of 65535 = 16384, divided by 60 LEDs = 273 hue steps per LED
+			uint16_t huePerLed = 16384 / NEO_PIXEL_LAMP_COUNT;
+			uint16_t ledHue = (uint16_t)((spectrumOffset + (i * huePerLed)) & 0xFFFF);
+
+			newColor = neoPixelStrip.ColorHSV(ledHue, 255, 255);
+		}
+		else
+		{
+			// Windows is controlling - render provided colors
+			newColor = lampArrayColorToNeoPixelColor(currentLampArrayState[i]);
+		}
+
 		if (newColor != neoPixelStrip.getPixelColor(i))
 		{
 			neoPixelStrip.setPixelColor(i, newColor);
