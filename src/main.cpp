@@ -1,14 +1,16 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 // Licensed under the MIT License.
-// Adapted for Seeed XIAO SAMD21 with 60 LED WS2812 strip (GRB)
+// Adapted for Seeed XIAO SAMD21 with configurable WS2812 strip (GRB)
 
 #include <Arduino.h>
 #include <Microsoft_HidForWindows.h>
 #include <Adafruit_NeoPixel.h>
 
-// 60 LED WS2812 strip on Seeed XIAO D2 (A2)
+// WS2812 strip on Seeed XIAO D2 (A2)
 #define NEO_PIXEL_PIN A2
-#define NEO_PIXEL_LAMP_COUNT 60
+#define NEO_PIXEL_LAMP_COUNT 120
+#define NEO_PIXEL_SPACING_MM 17
+#define NEO_PIXEL_STRIP_LENGTH_MM (NEO_PIXEL_LAMP_COUNT * NEO_PIXEL_SPACING_MM)
 
 // WS2812B is GRB format at 800KHz
 #define NEO_PIXEL_TYPE (NEO_GRB + NEO_KHZ800)
@@ -22,79 +24,42 @@ Adafruit_NeoPixel neoPixelStrip = Adafruit_NeoPixel(NEO_PIXEL_LAMP_COUNT, NEO_PI
 // UpdateLatency for all Lamps set to 2msec
 #define NEO_PIXEL_LAMP_UPDATE_LATENCY (0x02)
 
-// Lamp attributes for 60 LEDs in a line
+// Lamp attributes for a linear LED strip
 // All positions in millimeters from start of strip
 // All times in milliseconds
-static LampAttributes neoPixelStripLampAttributes[] PROGMEM =
+static_assert(NEO_PIXEL_LAMP_COUNT <= 0xFF, "NEO_PIXEL_LAMP_COUNT must fit in lamp id range (0-255).");
+
+static LampAttributes neoPixelStripLampAttributes[NEO_PIXEL_LAMP_COUNT];
+
+struct LampAttributesInitializer
+{
+	LampAttributesInitializer()
 	{
-		// Id  X  Y  Z  Latency                        Purposes           RED   GRN   BLUE  GAIN  PROGAMMBLE?           KEY
-		{0x00, 0, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
-		{0x01, 10, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
-		{0x02, 20, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
-		{0x03, 30, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
-		{0x04, 40, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
-		{0x05, 50, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
-		{0x06, 60, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
-		{0x07, 70, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
-		{0x08, 80, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
-		{0x09, 90, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
-		{0x0A, 100, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
-		{0x0B, 110, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
-		{0x0C, 120, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
-		{0x0D, 130, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
-		{0x0E, 140, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
-		{0x0F, 150, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
-		{0x10, 160, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
-		{0x11, 170, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
-		{0x12, 180, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
-		{0x13, 190, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
-		{0x14, 200, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
-		{0x15, 210, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
-		{0x16, 220, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
-		{0x17, 230, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
-		{0x18, 240, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
-		{0x19, 250, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
-		{0x1A, 260, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
-		{0x1B, 270, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
-		{0x1C, 280, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
-		{0x1D, 290, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
-		{0x1E, 300, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
-		{0x1F, 310, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
-		{0x20, 320, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
-		{0x21, 330, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
-		{0x22, 340, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
-		{0x23, 350, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
-		{0x24, 360, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
-		{0x25, 370, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
-		{0x26, 380, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
-		{0x27, 390, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
-		{0x28, 400, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
-		{0x29, 410, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
-		{0x2A, 420, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
-		{0x2B, 430, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
-		{0x2C, 440, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
-		{0x2D, 450, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
-		{0x2E, 460, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
-		{0x2F, 470, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
-		{0x30, 480, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
-		{0x31, 490, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
-		{0x32, 500, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
-		{0x33, 510, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
-		{0x34, 520, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
-		{0x35, 530, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
-		{0x36, 540, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
-		{0x37, 550, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
-		{0x38, 560, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
-		{0x39, 570, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
-		{0x3A, 580, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
-		{0x3B, 590, 0, 0, NEO_PIXEL_LAMP_UPDATE_LATENCY, LampPurposeAccent, 0xFF, 0xFF, 0xFF, 0x01, LAMP_IS_PROGRAMMABLE, 0x00},
+		for (uint16_t i = 0; i < NEO_PIXEL_LAMP_COUNT; i++)
+		{
+			neoPixelStripLampAttributes[i] = {
+				(uint8_t)i,
+				(uint16_t)(i * NEO_PIXEL_SPACING_MM),
+				0,
+				0,
+				NEO_PIXEL_LAMP_UPDATE_LATENCY,
+				LampPurposeAccent,
+				0xFF,
+				0xFF,
+				0xFF,
+				0x01,
+				LAMP_IS_PROGRAMMABLE,
+				0x00};
+		}
+	}
 };
-static_assert(((sizeof(neoPixelStripLampAttributes) / sizeof(LampAttributes)) == NEO_PIXEL_LAMP_COUNT), "neoPixelStripLampAttributes must have NEO_PIXEL_LAMP_COUNT items.");
+
+static LampAttributesInitializer lampAttributesInitializer;
 
 // Initialize Microsoft LampArray
-// Strip is 600mm long (60 * 10mm), 10mm tall, 1mm deep
+// Strip geometry automatically follows LED count and spacing.
 // Using Scene type so Windows renders it as ambient lighting device
-Microsoft_HidLampArray lampArray = Microsoft_HidLampArray(NEO_PIXEL_LAMP_COUNT, 600, 10, 1, LampArrayKindScene, 33, neoPixelStripLampAttributes);
+Microsoft_HidLampArray lampArray = Microsoft_HidLampArray(NEO_PIXEL_LAMP_COUNT, NEO_PIXEL_STRIP_LENGTH_MM, 10, 1, LampArrayKindScene, 33, neoPixelStripLampAttributes);
 
 // Autonomous mode: rainbow spectrum animation
 // Shows 25% of the spectrum across the whole strip, smoothly scrolling
@@ -125,14 +90,14 @@ void loop()
 		if (isAutonomousMode)
 		{
 			// Autonomous-Mode: Scrolling spectrum window
-			// All 60 LEDs show only 25% of spectrum at once, window scrolls through full spectrum
+			// All LEDs show only 25% of spectrum at once, window scrolls through full spectrum
 			uint32_t now = millis();
 
 			// Calculate spectrum offset (smoothly scrolls through 0-65535 hue range)
 			uint16_t spectrumOffset = (uint16_t)((now * RAINBOW_HUE_SPEED) & 0xFFFF);
 
 			// Each LED shows a portion of the 25% spectrum window
-			// 25% of 65535 = 16384, divided by 60 LEDs = 273 hue steps per LED
+			// 25% of 65535 = 16384, divided by LED count = hue step per LED
 			uint16_t huePerLed = 16384 / NEO_PIXEL_LAMP_COUNT;
 			uint16_t ledHue = (uint16_t)((spectrumOffset + (i * huePerLed)) & 0xFFFF);
 
