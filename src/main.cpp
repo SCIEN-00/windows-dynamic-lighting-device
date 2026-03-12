@@ -15,14 +15,29 @@
 // WS2812B is GRB format at 800KHz
 #define NEO_PIXEL_TYPE (NEO_GRB + NEO_KHZ800)
 
-// Apply LampArray intensity channel when available
-#define USE_INTENSITY 0
+// Apply LampArray intensity channel from host updates.
+#define USE_INTENSITY 1
+
+// USB serial debug output for incoming Windows LampArray data
+#define DEBUG_WINDOWS_LAMP_INPUT 1
+#define DEBUG_LOG_INTERVAL_MS 250
+
+#if DEBUG_WINDOWS_LAMP_INPUT
+#if defined(ARDUINO_ARCH_SAMD)
+#define DEBUG_SERIAL_PORT SerialUSB
+#else
+#define DEBUG_SERIAL_PORT Serial
+#endif
+#endif
 
 // Initialize NeoPixel library
 Adafruit_NeoPixel neoPixelStrip = Adafruit_NeoPixel(NEO_PIXEL_LAMP_COUNT, NEO_PIXEL_PIN, NEO_PIXEL_TYPE);
 
-// UpdateLatency for all Lamps set to 2msec
-#define NEO_PIXEL_LAMP_UPDATE_LATENCY (0x02)
+// Report realistic per-lamp update latency in milliseconds.
+#define NEO_PIXEL_LAMP_UPDATE_LATENCY (0x04)
+
+// Hint host to target up to 200 FPS effect updates.
+#define LAMP_ARRAY_MIN_UPDATE_INTERVAL_MS (5)
 
 // Lamp attributes for a linear LED strip
 // All positions in millimeters from start of strip
@@ -43,11 +58,11 @@ struct LampAttributesInitializer
 				0,
 				0,
 				NEO_PIXEL_LAMP_UPDATE_LATENCY,
-				LampPurposeAccent,
+				LampPurposeAccent | LampPurposeIllumination,
 				0xFF,
 				0xFF,
 				0xFF,
-				0x01,
+				0xFF,
 				LAMP_IS_PROGRAMMABLE,
 				0x00};
 		}
@@ -59,7 +74,7 @@ static LampAttributesInitializer lampAttributesInitializer;
 // Initialize Microsoft LampArray
 // Strip geometry automatically follows LED count and spacing.
 // Using Scene type so Windows renders it as ambient lighting device
-Microsoft_HidLampArray lampArray = Microsoft_HidLampArray(NEO_PIXEL_LAMP_COUNT, NEO_PIXEL_STRIP_LENGTH_MM, 10, 1, LampArrayKindScene, 33, neoPixelStripLampAttributes);
+Microsoft_HidLampArray lampArray = Microsoft_HidLampArray(NEO_PIXEL_LAMP_COUNT, NEO_PIXEL_STRIP_LENGTH_MM, 10, 1, LampArrayKindScene, LAMP_ARRAY_MIN_UPDATE_INTERVAL_MS, neoPixelStripLampAttributes);
 
 // Autonomous mode: rainbow spectrum animation
 // Shows 25% of the spectrum across the whole strip, smoothly scrolling
@@ -68,8 +83,22 @@ Microsoft_HidLampArray lampArray = Microsoft_HidLampArray(NEO_PIXEL_LAMP_COUNT, 
 // Forward declaration
 uint32_t lampArrayColorToNeoPixelColor(LampArrayColor lampArrayColor);
 
+#if DEBUG_WINDOWS_LAMP_INPUT
+static uint32_t lastDebugLogMs = 0;
+#endif
+
 void setup()
 {
+#if DEBUG_WINDOWS_LAMP_INPUT
+	DEBUG_SERIAL_PORT.begin(115200);
+	uint32_t serialWaitStart = millis();
+	while (!DEBUG_SERIAL_PORT && (millis() - serialWaitStart < 2000))
+	{
+		// Wait briefly for native USB serial to connect.
+	}
+	DEBUG_SERIAL_PORT.println("LampArray debug: logging first LED R,G,B,I from Windows input");
+#endif
+
 	// Initialize the NeoPixel library
 	neoPixelStrip.begin();
 	neoPixelStrip.clear();
@@ -80,6 +109,26 @@ void loop()
 {
 	LampArrayColor currentLampArrayState[NEO_PIXEL_LAMP_COUNT];
 	bool isAutonomousMode = lampArray.getCurrentState(currentLampArrayState);
+
+#if DEBUG_WINDOWS_LAMP_INPUT
+	if (!isAutonomousMode)
+	{
+		uint32_t now = millis();
+		if (now - lastDebugLogMs >= DEBUG_LOG_INTERVAL_MS)
+		{
+			lastDebugLogMs = now;
+			LampArrayColor c = currentLampArrayState[0];
+			DEBUG_SERIAL_PORT.print("Win LED0 R=");
+			DEBUG_SERIAL_PORT.print(c.RedChannel);
+			DEBUG_SERIAL_PORT.print(" G=");
+			DEBUG_SERIAL_PORT.print(c.GreenChannel);
+			DEBUG_SERIAL_PORT.print(" B=");
+			DEBUG_SERIAL_PORT.print(c.BlueChannel);
+			DEBUG_SERIAL_PORT.print(" I=");
+			DEBUG_SERIAL_PORT.println(c.IntensityChannel);
+		}
+	}
+#endif
 
 	bool update = false;
 
